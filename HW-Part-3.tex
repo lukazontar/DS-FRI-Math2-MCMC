@@ -1,0 +1,220 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\title{Part 3 - MCMC: Homework}
+\author{}
+\date{\vspace{-2.5em}}
+
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Part 3 - MCMC: Homework},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\begin{document}
+\maketitle
+
+\hypertarget{solution}{%
+\subsection{Solution}\label{solution}}
+
+\hypertarget{metropolis-hastings}{%
+\subsubsection{Metropolis-Hastings}\label{metropolis-hastings}}
+
+\textbf{Implement Metropolis-Hastings with Multivariate Normal proposal
+(mean 0, covariance matrix is a parameter).}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{metropolis\_hastings\_mv\_norm }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(cov, }\AttributeTok{mean=}\DecValTok{0}\NormalTok{) \{}
+  
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{hamiltonian-monte-carlo}{%
+\subsubsection{Hamiltonian Monte Carlo}\label{hamiltonian-monte-carlo}}
+
+\textbf{Implement HMC (step-size and number of steps are parameters; you
+can use unit mass matrix, but if you want to impress, you can tune the
+diagonal elements as well)}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{hmc }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(step\_size, n\_steps) \{}
+  
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{rejection-sample}{%
+\subsubsection{Rejection sample}\label{rejection-sample}}
+
+\textbf{Implement rejection sampling with your own choice of 2D
+envelope. This needn't be done for (4), because the dimensionality is
+too high.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rejection\_sampling }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{() \{}
+  
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+For each of the scenarios: - Use each sampling algorithm twice - once
+for some quick choice of MCMC paramters and once for tuned parameters.
+You may tune by hand via trial and error or use some other approach. -
+For each algorithm and run, generate 5 independent chains of 1000
+samples. - Apply standard MCMC diagnostics for each algorithm/run
+(traceplot for each parameter and all chains at the same time),
+autocovariance, ESS, and ESS/second. - Compare the means of the samples
+with the ground truth (for the bivariate normal and banana we know the
+true means for x and y, for the logistic regression fit a
+non-regularized regression with maximum-likelihood and compare sample
+means with MLE parameters). - Discuss which algorithm is the most
+successful in sampling from the target distribution. Include a
+discussion of how difficult/easy it was to tune MCMC parameters.
+
+\hypertarget{scenario-1-bivariate-standard-normal}{%
+\subsection{Scenario 1: Bivariate standard
+normal}\label{scenario-1-bivariate-standard-normal}}
+
+\hypertarget{scenario-2-the-shape-of-the-banana-function}{%
+\subsection{Scenario 2: The shape of the banana
+function}\label{scenario-2-the-shape-of-the-banana-function}}
+
+Distribution is in shape of the banana function from the examples.
+
+\hypertarget{scenario-3-the-shape-of-the-logistic-regression-likelihood}{%
+\subsection{Scenario 3: The shape of the logistic regression
+likelihood}\label{scenario-3-the-shape-of-the-logistic-regression-likelihood}}
+
+Distribution is in shape of the logistic regression likelihood for the
+dataset provided in dataset.csv, but using only the first two ``x''
+columns. Note that ``X1'' serves as the intercept, so don't have another
+in the model.
+
+For each of the above scenarios: - Use each sampling algorithm twice -
+once for some quick choice of MCMC paramters and once for tuned
+parameters. You may tune by hand via trial and error or use some other
+approach. - For each algorithm and run, generate 5 independent chains of
+1000 samples. - Apply standard MCMC diagnostics for each algorithm/run
+(traceplot for each parameter and all chains at the same time),
+autocovariance, ESS, and ESS/second. - Compare the means of the samples
+with the ground truth (for the bivariate normal and banana we know the
+true means for x and y, for the logistic regression fit a
+non-regularized regression with maximum-likelihood and compare sample
+means with MLE parameters). - Discuss which algorithm is the most
+successful in sampling from the target distribution. Include a
+discussion of how difficult/easy it was to tune MCMC parameters.
+
+Notes: * For reference, the ground truth coefficients for the logistic
+regression dataset are: 2.00 -0.84 -0.64 0.72 -0.10 -0.85 -0.97 0.23
+-0.68 -0.42 0.47 However, the dataset is only a sample from this
+process, so the estimates might diffrer. * HMC requires gradients! For
+bivariate normal it is trivial (do them analytically), for the banana
+they are already given in the R examples code, and for logistic
+regression you can also do them by hand (all the parameters are
+symmetrical, so it is just one partial derivative). * The key M-H and
+HMC code is already available from the examples, but do study it and
+make sure you understand how it relates to parts of the algorithms. Also
+note that you only need one M-H and HMC implementation for all the
+scenarios. Only the parameters, the target distribution, and its
+gradient are different.
+
+\end{document}

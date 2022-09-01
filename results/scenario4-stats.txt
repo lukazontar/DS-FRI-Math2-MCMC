@@ -1,0 +1,27 @@
+Scenario 4
+
+Hamiltonian Monte Carlo
+X1: ESS=5000.00, ESS/s=320.14, mean(est)=0.13, se(est)=0.00
+X2: ESS=9950.74, ESS/s=637.13, mean(est)=0.10, se(est)=0.00
+X3: ESS=14442.93, ESS/s=924.75, mean(est)=0.14, se(est)=0.00
+X4: ESS=7912.91, ESS/s=506.65, mean(est)=0.08, se(est)=0.00
+X5: ESS=183760.20, ESS/s=11765.79, mean(est)=0.08, se(est)=0.00
+X6: ESS=7039.23, ESS/s=450.71, mean(est)=0.20, se(est)=0.00
+X7: ESS=8538.53, ESS/s=546.70, mean(est)=0.15, se(est)=0.00
+X8: ESS=33783.36, ESS/s=2163.08, mean(est)=0.08, se(est)=0.00
+X9: ESS=11118.10, ESS/s=711.87, mean(est)=0.10, se(est)=0.00
+X10: ESS=17708.80, ESS/s=1133.86, mean(est)=0.08, se(est)=0.00
+X11: ESS=18450.02, ESS/s=1181.32, mean(est)=0.08, se(est)=0.00
+Metropolis Hastings
+X1: ESS=157.20, ESS/s=25.59, mean(est)=0.16, se(est)=0.01
+X2: ESS=208.90, ESS/s=34.01, mean(est)=0.11, se(est)=0.01
+X3: ESS=296.48, ESS/s=48.27, mean(est)=0.15, se(est)=0.01
+X4: ESS=427.42, ESS/s=69.59, mean(est)=0.10, se(est)=0.00
+X5: ESS=902.78, ESS/s=146.98, mean(est)=0.08, se(est)=0.00
+X6: ESS=229.08, ESS/s=37.30, mean(est)=0.22, se(est)=0.01
+X7: ESS=360.55, ESS/s=58.70, mean(est)=0.16, se(est)=0.01
+X8: ESS=408.10, ESS/s=66.44, mean(est)=0.10, se(est)=0.00
+X9: ESS=466.73, ESS/s=75.99, mean(est)=0.11, se(est)=0.01
+X10: ESS=376.14, ESS/s=61.24, mean(est)=0.09, se(est)=0.00
+X11: ESS=317.12, ESS/s=51.63, mean(est)=0.09, se(est)=0.00
+Rejection sampling

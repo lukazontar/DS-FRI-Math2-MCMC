@@ -1,0 +1,471 @@
+---
+title: 'Part 3 - MCMC: Homework'
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+set.seed(0)
+
+setwd("~/Documents/DataScience@FRI/Mat2 - HW Part 3")
+
+# Load helper libraries
+source("library/hamiltonian_monte_carlo.R")
+source("library/metropolis_hastings.R")
+source("library/rejection_sampling.R")
+source("library/diagnostics.R")
+
+library("MASS")
+library("mvtnorm")
+library("emdbook")
+library("mcmcse")
+library("ggplot2")
+library("tidyverse")
+library("patchwork")
+library("ggpubr")
+
+```
+
+For each of the scenarios:
+- Use each sampling algorithm twice - once for some quick choice of MCMC paramters and once for tuned parameters. You may tune by hand via trial and error or use some other approach.
+- For each algorithm and run, generate 5 independent chains of 1000 samples.
+- Apply standard MCMC diagnostics for each algorithm/run (traceplot for each parameter and all chains at the same time), autocovariance, ESS, and ESS/second.
+- Compare the means of the samples with the ground truth (for the bivariate normal and banana we know the true means for x and y, for the logistic regression fit a non-regularized regression with maximum-likelihood and compare sample means with MLE parameters).
+- Discuss which algorithm is the most successful in sampling from the target distribution. Include a discussion of how difficult/easy it was to tune MCMC parameters.
+
+## Scenario 1: Bivariate standard normal
+```{r bivariate_standard_normal}
+bivariate_standard_normal_density  <- function(x) {
+  mean_1 <- 0
+  mean_2 <- 0
+  cov <- matrix(c(1, 0, 0, 1), ncol = 2)
+  return(dmvnorm(
+    x = x,
+    mu = c(mean_1, mean_2),
+    Sigma = cov
+  ))
+}
+
+bivariate_standard_normal_sample  <- function() {
+  mean_1 <- 0
+  mean_2 <- 0
+  cov <- matrix(c(1, 0, 0, 1), ncol = 2)
+  return(mvrnorm(
+    n = 1,
+    mu = c(mean_1, mean_2),
+    Sigma = cov
+  ))
+}
+```
+
+
+Initialize parameters
+```{r scenario1_params, echo=FALSE}
+m <- 1000
+
+#### PARAMETERS
+#Scenario 1
+variables <- c("X1", "X2")
+p <- bivariate_standard_normal_density
+f <- p
+starting_point <- c(0, 0)
+
+# Scenario 1 - Rejection sampling
+g_sample <- bivariate_standard_normal_sample
+g_density <- bivariate_standard_normal_density
+M <- 1.1
+
+# Scenario 1 - Metropolis Hastings
+cov_mtx <- matrix(c(1, 0, 0, 1), ncol = 2)
+
+# Scenario 1 - Hamiltonian Monte Carlo
+minus_log_f <- function(x) {
+  -log(f(x))
+}
+minus_log_f_grad <- function(x) {
+  x
+}
+L <- 27
+epsilon <- 0.6
+```
+
+Algorithms evaluation
+```{r scenario1_evaluation, echo=FALSE}
+
+
+#### EVALUATING ALGORITHMS
+results = generate_results(
+  minus_log_f = minus_log_f,
+  minus_log_f_grad = minus_log_f_grad,
+  starting_point = starting_point,
+  epsilon = epsilon,
+  L = L,
+  m = m,
+  f = f,
+  g_sample = g_sample,
+  g_density = g_density,
+  M = M,
+  p = p,
+  cov_mtx = cov_mtx,
+  ground_truth = c(0, 0)
+)
+
+summary_results <-
+  summarize_results(
+    variables = variables,
+    hmc_results = results$hmc_results,
+    rej_samp_results = results$rej_samp_results,
+    mh_results = results$mh_results
+  )
+cat(paste("Scenario 1\n", summary_results$summary_stats, sep = "\n"),
+    file = "results/scenario1-stats.txt")
+ggsave(
+  plot = summary_results$summary_plot,
+  file = "results/scenario1-plots.pdf",
+  width = 8,
+  height = 14,
+  dpi = 300
+)
+```
+
+
+
+## Scenario 2: The shape of the banana function
+Distribution is in shape of the banana function from the examples.
+
+```{r banana_function}
+banana <- function (x) {
+  return(exp(-(x[1] ^ 2) / 200 - 0.5 * (x[2] + 0.05 * x[1] ^ 2 - 100 * 0.05) ^
+               2))
+}
+
+
+banana_minus_logf <- function(x) {
+  -(-(x[1] ^ 2) / 200 - 0.5 * (x[2] + B * x[1] ^ 2 - 100 * B) ^ 2)
+}
+
+banana_minus_logf_grad <- function(x) {
+  g1 <- -(x[1]) / 100 - 1.0 * (2 * B * x[1]) * (x[2] + B * x[1] ^ 2 - 100 *
+                                                  B)
+  g2 <- -1.0 * (x[2] + B * x[1] ^ 2 - 100 * B)
+  - c(g1, g2)
+}
+```
+
+Initialize parameters
+```{r scenario2_params, echo=FALSE}
+m <- 1000
+
+#### PARAMETERS
+#Scenario 2
+variables <- c("X1", "X2")
+p <- banana
+f <- p
+starting_point <- c(0, 0)
+B <- 0.05
+
+# Scenario 1 - Rejection sampling
+g_sample <- bivariate_standard_normal_sample
+g_density <- p
+M <- 10
+
+# Scenario 1 - Metropolis Hastings
+cov_mtx <- matrix(c(100, 0, 0, 100), ncol = 2)
+
+# Scenario 1 - Hamiltonian Monte Carlo
+minus_log_f <- banana_minus_logf
+minus_log_f_grad <- banana_minus_logf_grad
+L <- 27
+epsilon <- 0.6
+```
+
+Algorithms evaluation
+```{r scenario2_evaluation, echo=FALSE}
+
+
+#### EVALUATING ALGORITHMS
+results = generate_results(
+  minus_log_f = minus_log_f,
+  minus_log_f_grad = minus_log_f_grad,
+  starting_point = starting_point,
+  epsilon = epsilon,
+  L = L,
+  m = m,
+  f = f,
+  g_sample = g_sample,
+  g_density = g_density,
+  M = M,
+  p = p,
+  cov_mtx = cov_mtx,
+  ground_truth = c(0, 0)
+)
+
+summary_results <-
+  summarize_results(
+    variables = variables,
+    hmc_results = results$hmc_results,
+    rej_samp_results = results$rej_samp_results,
+    mh_results = results$mh_results
+  )
+cat(paste("Scenario 2\n", summary_results$summary_stats, sep = "\n"),
+    file = "results/scenario2-stats.txt")
+ggsave(
+  plot = summary_results$summary_plot,
+  file = "results/scenario2-plots.pdf",
+  width = 8,
+  height = 14,
+  dpi = 300
+)
+
+```
+
+## Scenario 3: The shape of the logistic regression likelihood
+Distribution is in shape of the logistic regression likelihood for the dataset provided in dataset.csv, but using only the first two "x" columns. Note that "X1" serves as the intercept, so don't have another in the model.
+```{r logistic_regression_likelihood, echo=FALSE}
+data <- read.csv("dataset.csv")
+X_full <- data[, names(data) != "y"]
+X_2_vars <- data[c("X1", "X2")]
+target_var <- data$y
+
+inv_log <- function (z) {
+  return (1 / (1 + exp(-z)))
+}
+
+logistic_regression_likelihood <- function(b) {
+  # Initialize X
+  X <- as.matrix(X_2_vars)
+  
+  # Log-likelihood
+  s <- inv_log(as.vector(X %*% b))
+  likelihood <- prod(s ^ target_var * (1 - s) ^ (1 - target_var))
+  
+  # Return posterior
+  return(likelihood)
+}
+
+logistic_regression_likelihood_minus_logf <- function(b) {
+  # Initialize X
+  X <- as.matrix(X_2_vars)
+  
+  # Log-likelihood
+  s <- inv_log(as.vector(X %*% b))
+  likelihood <-
+    -sum(target_var * log(s) + (1 - target_var) * log(1 - s))
+  
+  # Return posterior
+  return(likelihood)
+}
+
+
+logistic_regression_likelihood_minus_logf_grad <- function(b) {
+  # Initialize X
+  X <- as.matrix(X_2_vars)
+  
+  # Log-likelihood
+  s <- inv_log(as.vector(X %*% b))
+  
+  gradient <- -colSums((target_var - s) * X)
+  
+  # Return posterior
+  return(gradient)
+}
+```
+
+
+Initialize parameters
+```{r scenario3_params, echo=FALSE}
+
+m <- 1000
+
+#### PARAMETERS
+#Scenario 3
+variables <- c("X1", "X2")
+p <- logistic_regression_likelihood
+f <- p
+starting_point <- c(0, 0)
+
+# Scenario 3 - Rejection sampling
+g_sample <- bivariate_standard_normal_sample
+g_density <- p
+M <- 10
+
+# Scenario 3 - Metropolis Hastings
+cov_mtx <- 0.01 * matrix(c(1, 0, 0, 1), ncol = 2)
+
+# Scenario 3 - Hamiltonian Monte Carlo
+minus_log_f <- logistic_regression_likelihood_minus_logf
+minus_log_f_grad <- logistic_regression_likelihood_minus_logf_grad
+L <- 27
+epsilon <- 0.01
+```
+
+Algorithms evaluation
+```{r scenario3_evaluation, echo=FALSE}
+#### EVALUATING ALGORITHMS
+results = generate_results(
+  minus_log_f = minus_log_f,
+  minus_log_f_grad = minus_log_f_grad,
+  starting_point = starting_point,
+  epsilon = epsilon,
+  L = L,
+  m = m,
+  f = f,
+  g_sample = g_sample,
+  g_density = g_density,
+  M = M,
+  p = p,
+  cov_mtx = cov_mtx,
+  ground_truth = c(2.00, -0.84) 
+)
+
+summary_results <-
+  summarize_results(
+    variables = variables,
+    hmc_results = results$hmc_results,
+    rej_samp_results = results$rej_samp_results,
+    mh_results = results$mh_results
+  )
+
+cat(paste("Scenario 3\n", summary_results$summary_stats, sep = "\n"),
+    file = "results/scenario3-stats.txt")
+
+ggsave(
+  plot = summary_results$summary_plot,
+  file = "results/scenario3-plots.pdf",
+  width = 8,
+  height = 14,
+  dpi = 300
+)
+```
+
+## Scenario 4: The shape of the logistic regression likelihood - Full dataset
+Distribution is in shape of the logistic regression likelihood for the dataset provided in dataset.csv, but using only the first two "x" columns. Note that "X1" serves as the intercept, so don't have another in the model.
+
+```{r logistic_regression_likelihood, echo=FALSE}
+data <- read.csv("dataset.csv")
+X_full <- data[, names(data) != "y"]
+X_2_vars <- data[c("X1", "X2")]
+target_var <- data$y
+
+inv_log <- function (z) {
+  return (1 / (1 + exp(-z)))
+}
+
+logistic_regression_likelihood <- function(b) {
+  # Initialize X
+  X <- as.matrix(X_full)
+  
+  # Log-likelihood
+  s <- inv_log(as.vector(X %*% b))
+  likelihood <- prod(s ^ target_var * (1 - s) ^ (1 - target_var))
+  
+  # Return posterior
+  return(likelihood)
+}
+
+logistic_regression_likelihood_minus_logf <- function(b) {
+  # Initialize X
+  X <- as.matrix(X_full)
+  
+  # Log-likelihood
+  s <- inv_log(as.vector(X %*% b))
+  likelihood <-
+    -sum(target_var * log(s) + (1 - target_var) * log(1 - s))
+  
+  # Return posterior
+  return(likelihood)
+}
+
+
+logistic_regression_likelihood_minus_logf_grad <- function(b) {
+  # Initialize X
+  X <- as.matrix(X_full)
+  
+  # Log-likelihood
+  s <- inv_log(as.vector(X %*% b))
+  
+  gradient <- -colSums((target_var - s) * X)
+  
+  # Return posterior
+  return(gradient)
+}
+```
+
+Initialize parameters
+```{r scenario4_params, echo=FALSE}
+
+m <- 1000
+
+#### PARAMETERS
+#Scenario 4
+variables <- c("X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11")
+p <- logistic_regression_likelihood
+f <- p
+starting_point <- rep(0, 11)
+
+# Scenario 4 - Metropolis Hastings
+cov_mtx <- 0.01 * diag(11)
+
+# Scenario 4 - Hamiltonian Monte Carlo
+minus_log_f <- logistic_regression_likelihood_minus_logf
+minus_log_f_grad <- logistic_regression_likelihood_minus_logf_grad
+L <- 27
+epsilon <- 0.01
+```
+
+Algorithms evaluation
+```{r scenario4_evaluation, echo=FALSE}
+
+
+
+#### EVALUATING ALGORITHMS
+results = generate_results(
+  minus_log_f = minus_log_f,
+  minus_log_f_grad = minus_log_f_grad,
+  starting_point = starting_point,
+  epsilon = epsilon,
+  L = L,
+  m = m,
+  f = f,
+  g_sample = g_sample,
+  g_density = g_density,
+  M = M,
+  p = p,
+  cov_mtx = cov_mtx,
+  ground_truth = c(2.00, -0.84, -0.64,  0.72, -0.10, -0.85, -0.97,  0.23, -0.68, -0.42,  0.47),
+  include_rejection_sampling=FALSE
+)
+
+summary_results <-
+  summarize_results(
+    variables = variables,
+    hmc_results = results$hmc_results,
+    mh_results = results$mh_results,
+    include_rejection_sampling=FALSE
+  )
+
+cat(paste("Scenario 4\n", summary_results$summary_stats, sep = "\n"),
+    file = "results/scenario4-stats.txt")
+
+ggsave(
+  plot = summary_results$summary_plot,
+  file = "results/scenario4-plots.pdf",
+  width = 14,
+  height = 14,
+  dpi = 300
+)
+```
+
+
+
+
+
+Notes:
+* For reference, the ground truth coefficients for the logistic regression dataset are:
+ 2.00 -0.84 -0.64  0.72 -0.10 -0.85 -0.97  0.23 -0.68 -0.42  0.47
+However, the dataset is only a sample from this process, so the estimates might diffrer.
+* HMC requires gradients! For bivariate normal it is trivial (do them analytically), for the banana they are already given in the R examples code, and for logistic regression you can also do them by hand (all the parameters are symmetrical, so it is just one partial derivative).
+* The key M-H and HMC code is already available from the examples, but do study it and make sure you understand how it relates to parts of the algorithms. Also note that you only need one M-H and HMC implementation for all the scenarios. Only the parameters, the target distribution, and its gradient are different.
