@@ -1,11 +1,11 @@
 Scenario 2
 
 Hamiltonian Monte Carlo
-X1: ESS=1723.27, ESS/s=7339.36, mean(est)=8.07, se(est)=0.16
-X2: ESS=1280.75, ESS/s=5454.66, mean(est)=4.90, se(est)=0.13
+X1: ESS=1723.27, ESS/s=6719.96, mean(est)=8.07, se(est)=0.16
+X2: ESS=1280.75, ESS/s=4994.32, mean(est)=4.90, se(est)=0.13
 Metropolis Hastings
-X1: ESS=514.58, ESS/s=644.60, mean(est)=7.46, se(est)=0.21
-X2: ESS=499.94, ESS/s=626.26, mean(est)=4.39, se(est)=0.25
+X1: ESS=514.58, ESS/s=667.23, mean(est)=7.46, se(est)=0.21
+X2: ESS=499.94, ESS/s=648.25, mean(est)=4.39, se(est)=0.25
 Rejection sampling
-X1: ESS=5346.51, ESS/s=22577.36, mean(est)=0.80, se(est)=0.01
-X2: ESS=5000.00, ESS/s=21114.11, mean(est)=0.79, se(est)=0.01
+X1: ESS=5346.51, ESS/s=18069.87, mean(est)=0.80, se(est)=0.01
+X2: ESS=5000.00, ESS/s=16898.75, mean(est)=0.79, se(est)=0.01

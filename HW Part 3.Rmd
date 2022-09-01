@@ -126,7 +126,7 @@ ggsave(
   plot = summary_results$summary_plot,
   file = "results/scenario1-plots.pdf",
   width = 8,
-  height = 14,
+  height = 10,
   dpi = 300
 )
 ```
